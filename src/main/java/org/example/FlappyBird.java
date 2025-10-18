@@ -160,9 +160,56 @@ public class FlappyBird implements ActionListener, KeyListener {
 
     }
 
+    /*
+    * Metodo responsavel por desenha tudo na tela do Jogo
+    * Ele é chamado toda vez que a tela precisa ser atualizada
+    */
     public void paint(Graphics g){
+        //Desenha o Fundo do Céu
         g.setColor(Color.cyan);
         g.fillRect(0,0,LARGURA,ALTURA);
+
+        //Desenha o Chão
+        g.setColor(Color.orange);
+        g.fillRect(0, ALTURA - 120, LARGURA,120);
+
+        //Desenha o Gramado sobre o Chão
+        g.setColor(Color.green);
+        g.fillRect(0, ALTURA - 120, LARGURA, 20);
+
+        //Desenha o Pássaro
+        g.setColor(Color.red);
+        g.fillRect(bird.x,bird.y,bird.width,bird.height);
+
+        //Desenha o Cano
+        for(Rectangle pipe : pipes){
+            desenharCano(g, pipe);
+        }
+
+        //Defininfdo o Estilo do Texto - Placar e Mensagem
+        g.setColor(Color.white);
+        g.setFont(new Font("Arial",Font.BOLD,60));
+
+        //Menssagem do Jogo
+        if(!started){
+            g.drawString("Pressione Enter",180,ALTURA /2 -50);
+        }
+
+        //Mensagem Game Over
+        if(gameOver){
+            g.drawString("Game Over !", 250,ALTURA / 2 - 50);
+        }
+
+        //Menssagem com o Pontos
+        if(!gameOver && started){
+            g.drawString(String.valueOf(score), LARGURA /2 - 25 , 100);
+        }
+    }
+    /*Método para Auxilia o Desenho do Cano*/
+    public void desenharCano(Graphics g, Rectangle pipe){
+        //Definindo a Cor dos Canos
+        g.setColor(Color.green.darker());
+        g.fillRect(pipe.x,pipe.y, pipe.width,pipe.height);
     }
 
     @Override
@@ -171,14 +218,17 @@ public class FlappyBird implements ActionListener, KeyListener {
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
+    public void keyReleased(KeyEvent e) {
 
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
+    public void keyPressed(KeyEvent e) {
+    
 
     }
+
+
 
 
     public static void main(String[] args){
