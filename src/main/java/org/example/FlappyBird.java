@@ -38,6 +38,34 @@ public class FlappyBird implements ActionListener, KeyListener {
         jFrame.setResizable(false);
         jFrame.setVisible(true);
 
+        bird = new Rectangle(LARGURA / 2 - 10, ALTURA / 2 - 10, 20,20);
+        pipes = new ArrayList<>();
+
+        addPipe(true);
+        addPipe(true);
+        addPipe(true);
+        addPipe(true);
+
+        timer.start();
+
+    }
+
+    public void addPipe(boolean start){
+        int space = 300;
+        int width = 100;
+        int height = 50 + rand.nextInt(300);
+
+        if(start){
+            pipes.add(new Rectangle(LARGURA + width + pipes.size() * 300, ALTURA - height - 120, width, height));
+            pipes.add(new Rectangle(LARGURA + width + (pipes.size() - 1) * 300, 0, width, ALTURA - height - space));
+        }else {
+            pipes.add(new Rectangle(pipes.get(pipes.size() - 1).x + 600, ALTURA - height - 120, width, height));
+            pipes.add(new Rectangle(pipes.get(pipes.size() - 1).x, 0, width, ALTURA - height - space));
+        }
+    }
+
+    public void jump(){
+        
     }
 
     @Override
