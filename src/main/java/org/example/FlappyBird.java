@@ -65,7 +65,27 @@ public class FlappyBird implements ActionListener, KeyListener {
     }
 
     public void jump(){
-        
+        if(gameOver){
+            bird = new Rectangle(LARGURA / 2 - 10, ALTURA / 2 - 10,20,20);
+            pipes.clear();
+            yMotion = 0;
+            score = 0;
+
+            addPipe(true);
+            addPipe(true);
+            addPipe(true);
+            addPipe(true);
+            gameOver = false;
+        }
+
+        if(!started){
+            started = true;
+        } else if (!gameOver) {
+            if(yMotion > 0){
+                yMotion = 0;
+            }
+            yMotion -= 10;
+        }
     }
 
     @Override
