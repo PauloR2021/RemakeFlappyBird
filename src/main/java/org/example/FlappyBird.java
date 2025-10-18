@@ -25,7 +25,7 @@ public class FlappyBird implements ActionListener, KeyListener {
     public FlappyBird(){
 
         JFrame jFrame = new JFrame();
-        Timer timer = new Timer(20,this);
+        Timer timer = new Timer(20,this); // Timer para Atualizar o Game
 
         renderizador = new Renderizador();
         rand = new Random();
@@ -50,12 +50,20 @@ public class FlappyBird implements ActionListener, KeyListener {
 
     }
 
-    public void addPipe(boolean start){
-        int space = 300;
-        int width = 100;
-        int height = 50 + rand.nextInt(300);
+    /*
+    * Método para Criar os Canos ativos na Tela
+    * Paramentro Start indica se é a primeira vez que os canos estão sendo adicionados
+    */
 
+    public void addPipe(boolean start){
+        //Espaçamento e tamanho dos Canos
+        int space = 300; //Defini a distancia vertical
+        int width = 100; //Largura de Cada Cano
+        int height = 50 + rand.nextInt(300); //Define uma altura aleatoria para os canoss
+
+        //Quando o jogo Começa
         if(start){
+            //Cria os canos de cima e de baixo
             pipes.add(new Rectangle(LARGURA + width + pipes.size() * 300, ALTURA - height - 120, width, height));
             pipes.add(new Rectangle(LARGURA + width + (pipes.size() - 1) * 300, 0, width, ALTURA - height - space));
         }else {
@@ -88,8 +96,67 @@ public class FlappyBird implements ActionListener, KeyListener {
         }
     }
 
+    /*
+    * Criando o Loop Principal do Game, que atualiza a lógica do jogo a cada fração de segundo
+    * Ele é chamado automaticamente por um timer que roda a cada 20 milissegundos
+    **/
     @Override
     public void actionPerformed(ActionEvent e) {
+        //Controla a Velocidade e Contagem dos Frames
+        int speed = 10; //Velocidade dos Canos
+        ticks++; //Contador de Frames
+
+
+        //Movimenta os Canos, a cada Pipe é um cano verde
+        if(started){
+            for (int i = 0; i< pipes.size(); i++){
+                Rectangle pipe = pipes.get(i);
+                pipe.x -= speed;
+            }
+
+            //Gravidade do Passaro
+            if(ticks % 2 == 0 && yMotion < 15){
+                yMotion += 2;
+            }
+
+            //Remoção e Criação de Novos Canos
+            for (int i = 0; i < pipes.size(); i++){
+                Rectangle pipe = pipes.get(i);
+
+                if(pipe.x + pipe.width < 0){
+                    pipes.remove(pipe);
+                    if(pipe.y == 0){
+                        addPipe(false);
+                    }
+
+                }
+            }
+
+            bird.y += yMotion; //Move o Passaro Verticalmente
+
+            //Pontuação e Colisão
+            for(Rectangle pipe : pipes){
+                if(pipe.y == 0 && bird.x + bird.width / 2 > pipe.x + pipe.width / 2 - 10 &&
+                    bird.x + bird.width / 2 < pipe.x + pipe.width / 2 + 10){
+                    score++;
+                }
+
+                if(pipe.intersects(bird)){
+                    gameOver = true;
+                    bird.x = pipe.x - bird.width;
+                }
+            }
+
+            //Limites da Tela
+            if(bird.y > ALTURA - 120 || bird.y < 0){
+                gameOver = true;
+            }
+
+            if(bird.y + yMotion >= ALTURA - 120){
+                bird.y = ALTURA - 120 - bird.height;
+            }
+        }
+        renderizador.repaint(); //Faz a Atualização do Desenho na Tela
 
     }
 
