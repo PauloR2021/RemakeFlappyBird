@@ -15,11 +15,9 @@ public class FlappyBird implements ActionListener, KeyListener {
     public Renderizador renderizador; //Chamando o Renderizador
 
     public Rectangle bird; //Definindo o Personagem
-
     public Rectangle enemy; //Definindo o Inimigo
     public int enemySpeed = 6; //Definindo a Velocidade do Inimigo
     int lastSpeedUpScore = 0; //Ultima Velocidade
-
     public ArrayList<Rectangle> pipes; //Criando os Obstaculos
     public int ticks, yMotion, score; //Criando os Metodos de Pontuação
     public boolean gameOver, started; //Criando os Metodos de Game Over e Inicio
@@ -44,7 +42,7 @@ public class FlappyBird implements ActionListener, KeyListener {
         jFrame.setVisible(true);
 
         bird = new Rectangle(LARGURA / 2 - 10, ALTURA / 2 - 10, 20,20); //Criando o Pássaro
-        enemy = new Rectangle(LARGURA / 2 - 10, ALTURA /2 -10, 20,20); //Criando o Inimigo
+        enemy = new Rectangle(-50, 100 + rand.nextInt(ALTURA - 220), 20, 20); //Criando o Inimigo
         pipes = new ArrayList<>();
 
         addPipe(true);
