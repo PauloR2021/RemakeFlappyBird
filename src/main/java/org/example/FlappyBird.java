@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -16,6 +15,11 @@ public class FlappyBird implements ActionListener, KeyListener {
     public Renderizador renderizador; //Chamando o Renderizador
 
     public Rectangle bird; //Definindo o Personagem
+
+    public Rectangle enemy; //Definindo o Inimigo
+    public int enemySpeed = 6; //Definindo a Velocidade do Inimigo
+    int lastSpeedUpScore = 0; //Ultima Velocidade
+
     public ArrayList<Rectangle> pipes; //Criando os Obstaculos
     public int ticks, yMotion, score; //Criando os Metodos de Pontuação
     public boolean gameOver, started; //Criando os Metodos de Game Over e Inicio
@@ -39,7 +43,8 @@ public class FlappyBird implements ActionListener, KeyListener {
         jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
 
-        bird = new Rectangle(LARGURA / 2 - 10, ALTURA / 2 - 10, 20,20);
+        bird = new Rectangle(LARGURA / 2 - 10, ALTURA / 2 - 10, 20,20); //Criando o Pássaro
+        enemy = new Rectangle(LARGURA / 2 - 10, ALTURA /2 -10, 20,20); //Criando o Inimigo
         pipes = new ArrayList<>();
 
         addPipe(true);
@@ -55,7 +60,6 @@ public class FlappyBird implements ActionListener, KeyListener {
     * Método para Criar os Canos ativos na Tela
     * Paramentro Start indica se é a primeira vez que os canos estão sendo adicionados
     */
-
     public void addPipe(boolean start){
         //Espaçamento e tamanho dos Canos
         int space = 300; //Defini a distancia vertical
@@ -68,8 +72,8 @@ public class FlappyBird implements ActionListener, KeyListener {
             pipes.add(new Rectangle(LARGURA + width + pipes.size() * 300, ALTURA - height - 120, width, height));
             pipes.add(new Rectangle(LARGURA + width + (pipes.size() - 1) * 300, 0, width, ALTURA - height - space));
         }else {
-            pipes.add(new Rectangle(pipes.get(pipes.size() - 1).x + 600, ALTURA - height - 120, width, height));
-            pipes.add(new Rectangle(pipes.get(pipes.size() - 1).x, 0, width, ALTURA - height - space));
+            pipes.add(new Rectangle(pipes.getLast().x + 600, ALTURA - height - 120, width, height));
+            pipes.add(new Rectangle(pipes.getLast().x, 0, width, ALTURA - height - space));
         }
     }
 
@@ -90,7 +94,7 @@ public class FlappyBird implements ActionListener, KeyListener {
 
         if(!started){
             started = true;
-        } else if (!gameOver) {
+        } else {
             if(yMotion > 0){
                 yMotion = 0;
             }
@@ -100,19 +104,37 @@ public class FlappyBird implements ActionListener, KeyListener {
 
     /*
     * Criando o Loop Principal do Game, que atualiza a lógica do jogo a cada fração de segundo
-    * Ele é chamado automaticamente por um timer que roda a cada 20 milissegundos
-    **/
+    * Ele é chamado automaticamente por um timer que roda a cada 20 milissegundos */
     @Override
     public void actionPerformed(ActionEvent e) {
         //Controla a Velocidade e Contagem dos Frames
         int speed = 10; //Velocidade dos Canos
         ticks++; //Contador de Frames
 
+        //Movimenta o Inimigo na Horizontal
+        enemy.x += enemySpeed;
+
+        //Quando o Inimigo sair da Tela pela Direita, volta à esquerda
+        if(enemy.x > LARGURA){
+            enemy.x = -enemy.width;
+            enemy.y = 100 + rand.nextInt(ALTURA - 220); //Muda a Altura Aleatoriamente
+        }
+
+        //Detecta Colisão com o Pássaro
+        if(enemy.intersects(bird)){
+            gameOver = true;
+        }
+
+        //Aumenta a Dificuldade do Jogo
+        if(score % 5 == 0 && score >0 && score != lastSpeedUpScore){
+            enemySpeed = 6 + score /5;
+            lastSpeedUpScore = score;
+        }
+
 
         //Movimenta os Canos, a cada Pipe é um cano verde
         if(started){
-            for (int i = 0; i< pipes.size(); i++){
-                Rectangle pipe = pipes.get(i);
+            for (Rectangle pipe : pipes) {
                 pipe.x -= speed;
             }
 
@@ -164,8 +186,7 @@ public class FlappyBird implements ActionListener, KeyListener {
 
     /*
     * Metodo responsavel por desenha tudo na tela do Jogo
-    * Ele é chamado toda vez que a tela precisa ser atualizada
-    */
+    * Ele é chamado toda a vez que a tela precisa ser atualizada */
     public void paint(Graphics g){
         //Desenha o Fundo do Céu
         g.setColor(Color.cyan);
@@ -183,18 +204,22 @@ public class FlappyBird implements ActionListener, KeyListener {
         g.setColor(Color.red);
         g.fillRect(bird.x,bird.y,bird.width,bird.height);
 
+        //Desenha o Inimigo
+        g.setColor(Color.black);
+        g.fillRect(enemy.x, enemy.y, enemy.width,enemy.height);
+
         //Desenha o Cano
         for(Rectangle pipe : pipes){
             desenharCano(g, pipe);
         }
 
-        //Defininfdo o Estilo do Texto - Placar e Mensagem
+        //Definindo o Estilo do Texto - Placar e Mensagem
         g.setColor(Color.white);
         g.setFont(new Font("Arial",Font.BOLD,60));
 
         //Menssagem do Jogo
         if(!started){
-            g.drawString("Pressione Enter",180,ALTURA /2 -50);
+            g.drawString("Pressione Space",180,ALTURA /2 -50);
         }
 
         //Mensagem Game Over
@@ -207,6 +232,7 @@ public class FlappyBird implements ActionListener, KeyListener {
             g.drawString(String.valueOf(score), LARGURA /2 - 25 , 100);
         }
     }
+
     /*Método para Auxilia o Desenho do Cano*/
     public void desenharCano(Graphics g, Rectangle pipe){
         //Definindo a Cor dos Canos
