@@ -36,6 +36,7 @@ public class FlappyBird implements ActionListener, KeyListener {
         jFrame.setSize(LARGURA,ALTURA);
         jFrame.addKeyListener(this);
         jFrame.setResizable(false);
+        jFrame.setLocationRelativeTo(null);
         jFrame.setVisible(true);
 
         bird = new Rectangle(LARGURA / 2 - 10, ALTURA / 2 - 10, 20,20);
@@ -73,6 +74,7 @@ public class FlappyBird implements ActionListener, KeyListener {
     }
 
     public void jump(){
+
         if(gameOver){
             bird = new Rectangle(LARGURA / 2 - 10, ALTURA / 2 - 10,20,20);
             pipes.clear();
@@ -222,13 +224,16 @@ public class FlappyBird implements ActionListener, KeyListener {
 
     }
 
+    /*Metodo para Capturar as Teclas Apertadas*/
     @Override
     public void keyPressed(KeyEvent e) {
-    
+
+        //Quando for apertado o Space vai chamar o Metodo de Iniciar o Jogo e Pular
+        if(e.getKeyCode() == KeyEvent.VK_SPACE){
+            jump();
+        }
 
     }
-
-
 
 
     public static void main(String[] args){
